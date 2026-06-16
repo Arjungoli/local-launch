@@ -635,11 +635,18 @@ a {
   line-height: 1.5;
 }
 
+.team-links {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  margin-top: 16px;
+}
+
 .team-linkedin {
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  margin-top: 16px;
   font-size: 0.85rem;
   font-weight: 500;
   color: var(--color-text-muted);
@@ -647,6 +654,18 @@ a {
 }
 
 .team-linkedin:hover {
+  color: var(--color-text);
+}
+
+.team-email {
+  font-size: 0.8rem;
+  font-weight: 500;
+  color: var(--color-text-muted);
+  word-break: break-all;
+  transition: color var(--transition);
+}
+
+.team-email:hover {
   color: var(--color-text);
 }
 
@@ -701,6 +720,78 @@ a {
   color: var(--color-text-muted);
 }
 
+.contact-form {
+  max-width: 640px;
+  margin: 56px auto 0;
+  padding: 40px;
+  background: var(--color-bg-card);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  text-align: left;
+}
+
+.contact-form-title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin-bottom: 24px;
+  text-align: center;
+}
+
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+
+.form-field {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 20px;
+}
+
+.form-field label {
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: var(--color-text-muted);
+}
+
+.contact-form input,
+.contact-form textarea {
+  width: 100%;
+  padding: 12px 14px;
+  font-family: inherit;
+  font-size: 0.95rem;
+  color: var(--color-text);
+  background: var(--color-bg-elevated);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  transition: border-color var(--transition), background var(--transition);
+}
+
+.contact-form input::placeholder,
+.contact-form textarea::placeholder {
+  color: var(--color-text-muted);
+}
+
+.contact-form input:focus,
+.contact-form textarea:focus {
+  outline: none;
+  border-color: var(--color-border-hover);
+  background: var(--color-surface);
+}
+
+.contact-form textarea {
+  resize: vertical;
+  min-height: 120px;
+}
+
+.contact-form .btn-primary {
+  width: 100%;
+  margin-top: 8px;
+  cursor: pointer;
+}
+
 /* ── Footer ── */
 .footer {
   padding: 48px 0;
@@ -748,6 +839,15 @@ a {
 @media (max-width: 640px) {
   .nav-toggle {
     display: flex;
+  }
+
+  .form-row {
+    grid-template-columns: 1fr;
+    gap: 0;
+  }
+
+  .contact-form {
+    padding: 28px 20px;
   }
 
   .nav-right {
