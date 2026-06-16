@@ -409,6 +409,13 @@ a {
   line-height: 1.2;
 }
 
+.section-intro {
+  margin-top: 16px;
+  max-width: 560px;
+  color: var(--color-text-muted);
+  font-size: 1.05rem;
+}
+
 /* ── About ── */
 .about-grid {
   display: grid;
