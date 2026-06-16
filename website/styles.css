@@ -99,7 +99,7 @@ a {
 }
 
 .logo-img {
-  height: 52px;
+  height: 72px;
   width: auto;
   display: block;
   transition: filter var(--transition);
@@ -110,7 +110,7 @@ a {
 }
 
 .footer-brand .logo-img {
-  height: 48px;
+  height: 64px;
 }
 
 .theme-toggle {
