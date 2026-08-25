@@ -175,7 +175,7 @@ a {
   gap: 20px;
 }
 
-.nav-linkedin {
+.nav-social {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -187,13 +187,14 @@ a {
   transition: color var(--transition), border-color var(--transition), background var(--transition);
 }
 
-.nav-linkedin:hover {
+.nav-social:hover {
   color: var(--color-text);
   border-color: var(--color-border-hover);
   background: var(--color-accent-glow);
 }
 
-.linkedin-icon {
+.linkedin-icon,
+.instagram-icon {
   width: 18px;
   height: 18px;
 }
