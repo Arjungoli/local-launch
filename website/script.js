@@ -1,6 +1,12 @@
 const navToggle = document.getElementById('nav-toggle');
 const navLinks = document.getElementById('nav-links');
-const themeSelect = document.getElementById('theme-select');
+const themeButton = document.getElementById('theme-button');
+const themeButtonSwatch = document.getElementById('theme-button-swatch');
+const themeButtonLabel = document.getElementById('theme-button-label');
+const themeModal = document.getElementById('theme-modal');
+const themeModalClose = document.getElementById('theme-modal-close');
+const themeSearch = document.getElementById('theme-search');
+const themeList = document.getElementById('theme-list');
 const html = document.documentElement;
 const logos = document.querySelectorAll('.logo-img');
 
@@ -359,6 +365,20 @@ function applySlackTheme(theme) {
   setLogoInvert(isLight);
 }
 
+const BUILTIN_PREVIEW = {
+  Dark: { bg: '#000000', accent: '#ffffff' },
+  Light: { bg: '#f7f7f7', accent: '#111111' },
+  Blue: { bg: '#0a1428', accent: '#4f8cff' }
+};
+
+function themePreview(name) {
+  if (BUILTIN_PREVIEW[name]) return BUILTIN_PREVIEW[name];
+  const t = themeByName[name];
+  return t ? { bg: t.colors[0], accent: t.colors[2] } : { bg: '#000', accent: '#fff' };
+}
+
+let currentTheme = 'Dark';
+
 function applyTheme(name) {
   if (BUILTIN_THEMES.includes(name)) {
     applyBuiltin(name);
@@ -368,28 +388,93 @@ function applyTheme(name) {
     applyBuiltin('Dark');
     name = 'Dark';
   }
+  currentTheme = name;
   localStorage.setItem('theme', name);
+  updateThemeButton(name);
+  updateActiveItem(name);
 }
 
-function buildThemeOptions() {
-  const groups = [
-    { label: 'Basic', names: BUILTIN_THEMES },
-    { label: 'Slack Themes', names: SLACK_THEMES.map(t => t.name) }
-  ];
-  groups.forEach(group => {
-    const optgroup = document.createElement('optgroup');
-    optgroup.label = group.label;
-    group.names.forEach(name => {
-      const opt = document.createElement('option');
-      opt.value = name;
-      opt.textContent = name;
-      optgroup.appendChild(opt);
-    });
-    themeSelect.appendChild(optgroup);
+function updateThemeButton(name) {
+  const { bg, accent } = themePreview(name);
+  themeButtonLabel.textContent = name;
+  themeButtonSwatch.style.background =
+    `linear-gradient(135deg, ${bg} 0%, ${bg} 50%, ${accent} 50%, ${accent} 100%)`;
+}
+
+function updateActiveItem(name) {
+  themeList.querySelectorAll('.theme-item').forEach(item => {
+    item.classList.toggle('active', item.dataset.theme === name);
+    item.setAttribute('aria-selected', item.dataset.theme === name);
   });
 }
 
-buildThemeOptions();
+function buildThemeList() {
+  const allNames = [...BUILTIN_THEMES, ...SLACK_THEMES.map(t => t.name)];
+  const frag = document.createDocumentFragment();
+  allNames.forEach(name => {
+    const { bg, accent } = themePreview(name);
+    const item = document.createElement('button');
+    item.type = 'button';
+    item.className = 'theme-item';
+    item.dataset.theme = name;
+    item.dataset.search = name.toLowerCase();
+    item.setAttribute('role', 'option');
+
+    const swatch = document.createElement('span');
+    swatch.className = 'theme-item-swatch';
+    swatch.style.background = bg;
+    swatch.style.setProperty('--dot', accent);
+
+    const label = document.createElement('span');
+    label.className = 'theme-item-name';
+    label.textContent = name;
+
+    item.append(swatch, label);
+    item.addEventListener('click', () => {
+      applyTheme(name);
+      closeThemeModal();
+    });
+    frag.appendChild(item);
+  });
+
+  const empty = document.createElement('p');
+  empty.className = 'theme-empty';
+  empty.id = 'theme-empty';
+  empty.textContent = 'No themes found';
+  empty.hidden = true;
+
+  themeList.append(frag, empty);
+}
+
+function filterThemes(query) {
+  const q = query.trim().toLowerCase();
+  let visible = 0;
+  themeList.querySelectorAll('.theme-item').forEach(item => {
+    const match = !q || item.dataset.search.includes(q);
+    item.hidden = !match;
+    if (match) visible += 1;
+  });
+  document.getElementById('theme-empty').hidden = visible > 0;
+}
+
+function openThemeModal() {
+  themeModal.hidden = false;
+  themeButton.setAttribute('aria-expanded', 'true');
+  themeSearch.value = '';
+  filterThemes('');
+  updateActiveItem(currentTheme);
+  const active = themeList.querySelector('.theme-item.active');
+  if (active) active.scrollIntoView({ block: 'center' });
+  themeSearch.focus();
+}
+
+function closeThemeModal() {
+  themeModal.hidden = true;
+  themeButton.setAttribute('aria-expanded', 'false');
+  themeButton.focus();
+}
+
+buildThemeList();
 
 const legacyMap = { dark: 'Dark', light: 'Light', blue: 'Blue' };
 const stored = localStorage.getItem('theme');
@@ -397,10 +482,15 @@ const initialTheme = legacyMap[stored] || stored || 'Dark';
 const validInitial =
   BUILTIN_THEMES.includes(initialTheme) || themeByName[initialTheme] ? initialTheme : 'Dark';
 
-themeSelect.value = validInitial;
 applyTheme(validInitial);
 
-themeSelect.addEventListener('change', () => applyTheme(themeSelect.value));
+themeButton.addEventListener('click', openThemeModal);
+themeModalClose.addEventListener('click', closeThemeModal);
+themeSearch.addEventListener('input', () => filterThemes(themeSearch.value));
+themeModal.querySelector('.theme-modal-backdrop').addEventListener('click', closeThemeModal);
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape' && !themeModal.hidden) closeThemeModal();
+});
 
 navToggle.addEventListener('click', () => {
   const isOpen = navLinks.classList.toggle('open');
